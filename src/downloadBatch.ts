@@ -20,7 +20,6 @@ export async function downloadBatch(start_timestamp: string) {
   let lastTimestamp: string | undefined = undefined;
   let hasMore = true;
   let downloadedCount = 0;
-  let downloadErrorCount = 0;
   try {
     const { data, error } = await supabaseAdmin
       .from(supabaseTable)
@@ -66,7 +65,6 @@ export async function downloadBatch(start_timestamp: string) {
           const result = results[j];
           if (result.error) {
             console.log(result.error);
-            downloadErrorCount++;
             return {
               hasTableError: true,
               lastTimestamp,
@@ -99,7 +97,7 @@ export async function downloadBatch(start_timestamp: string) {
   console.log(
     `Batch complete - Downloaded ${downloadedCount} files in ${Math.round(
       (end - start) / 1000
-    )} seconds - ${downloadErrorCount} errors`
+    )} seconds`
   );
   return {
     hasTableError: false,
