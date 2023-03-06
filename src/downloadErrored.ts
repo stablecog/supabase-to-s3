@@ -1,11 +1,8 @@
 import dotenv from "dotenv";
 import {
-  addToErroredTimestamps,
   addToErroredTimestampsSecondPass,
   createDirs,
   getErroredTimestamps,
-  getLastSuccessfulTimestamp,
-  saveLastTimestamp,
 } from "./helpers";
 import { downloadBatch } from "./downloadBatch";
 
