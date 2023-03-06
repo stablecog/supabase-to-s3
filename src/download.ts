@@ -65,7 +65,11 @@ export async function downloadBatch(start_timestamp: string) {
             console.log(result.error);
             downloadErrorCount++;
             addToErroredObjects(paths[j]);
-            continue;
+            return {
+              hasTableError: true,
+              lastTimestamp,
+              hasMore,
+            };
           }
           const buffer = toBuffer(await result.data.arrayBuffer());
           fs.writeFileSync(finalPaths[j], buffer);
