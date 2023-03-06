@@ -1,6 +1,7 @@
 import {
   downloadDir,
   erroredTimestampsFile,
+  erroredTimestampsSecondPassFile,
   outputDir,
   timestampFile,
 } from "./constants";
@@ -26,10 +27,22 @@ export function createDirs() {
   if (!fs.existsSync(`${outputDir}/${erroredTimestampsFile}`)) {
     fs.writeFileSync(`${outputDir}/${erroredTimestampsFile}`, "");
   }
+
+  // Create the errored timestamps second pass file if it doesn't exist
+  if (!fs.existsSync(`${outputDir}/${erroredTimestampsSecondPassFile}`)) {
+    fs.writeFileSync(`${outputDir}/${erroredTimestampsSecondPassFile}`, "");
+  }
 }
 
 export const addToErroredTimestamps = (timestamp: string) => {
   fs.appendFileSync(`${outputDir}/${erroredTimestampsFile}`, `${timestamp},`);
+};
+
+export const addToErroredTimestampsSecondPass = (timestamp: string) => {
+  fs.appendFileSync(
+    `${outputDir}/${erroredTimestampsSecondPassFile}`,
+    `${timestamp},`
+  );
 };
 
 export const saveLastTimestamp = (timestamp: string) => {
@@ -38,6 +51,17 @@ export const saveLastTimestamp = (timestamp: string) => {
 
 export const getLastSuccessfulTimestamp = () => {
   return fs.readFileSync(`${outputDir}/${timestampFile}`, "utf8");
+};
+
+export const getErroredTimestamps = () => {
+  const erroredTimestampsString = fs.readFileSync(
+    `${outputDir}/${erroredTimestampsFile}`,
+    "utf8"
+  );
+  if (erroredTimestampsString) {
+    return erroredTimestampsString.split(",");
+  }
+  return [];
 };
 
 export function toBuffer(arrayBuffer: ArrayBuffer) {

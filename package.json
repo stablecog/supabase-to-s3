@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "download": "npx tsc && node dist/download.js"
+    "download": "npx tsc && node dist/download.js",
+    "downloadedErrored": "npx tsc && node dist/downloadedErrored.js",
+    "count": "npx tsc && node dist/count.js"
   },
   "keywords": [],
   "author": "",

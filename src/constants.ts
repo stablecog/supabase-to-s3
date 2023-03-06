@@ -14,4 +14,6 @@ export const downloadDir = "downloads";
 export const outputDir = "outputs";
 export const timestampFile = "last_successful_timestamp.txt";
 export const erroredTimestampsFile = "errored_timestamps.txt";
+export const erroredTimestampsSecondPassFile =
+  "errored_timestamps_second_pass.txt";
 export const maxFetchDuration = 5000;
