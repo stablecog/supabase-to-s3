@@ -12,3 +12,7 @@ vite.config.ts.*
 download.js
 download.js.*
 downloads
+last_timestamp.txt
+errored_objects.txt
+dist
+outputs
