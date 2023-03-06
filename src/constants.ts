@@ -4,5 +4,5 @@ export const supabaseBucket = "generation";
 export const downloadBatchSize = 25;
 export const downloadDir = "downloads";
 export const outputDir = "outputs";
-export const timestampFile = "last_timestamp.txt";
+export const timestampFile = "last_successful_timestamp.txt";
 export const erroredObjectsFile = "errored_objects.txt";

@@ -59,11 +59,6 @@ async function main() {
         addToErroredObjects(paths[j]);
         continue;
       }
-      if (Math.random() < 0.2) {
-        downloadErrorCount++;
-        addToErroredObjects(paths[j]);
-        continue;
-      }
       const buffer = toBuffer(await result.data.arrayBuffer());
       fs.writeFileSync(finalPaths[j], buffer);
       downloadedCount++;
