@@ -1,6 +1,7 @@
 import {
   downloadDir,
   erroredObjectsFile,
+  erroredTimestampsFile,
   outputDir,
   timestampFile,
 } from "./constants";
@@ -26,10 +27,27 @@ export function createDirs() {
   if (!fs.existsSync(`${outputDir}/${erroredObjectsFile}`)) {
     fs.writeFileSync(`${outputDir}/${erroredObjectsFile}`, "");
   }
+
+  // Create the errored timestamps file if it doesn't exist
+  if (!fs.existsSync(`${outputDir}/${erroredTimestampsFile}`)) {
+    fs.writeFileSync(`${outputDir}/${erroredTimestampsFile}`, "");
+  }
 }
 
 export const addToErroredObjects = (objectName: string) => {
   fs.appendFileSync(`${outputDir}/${erroredObjectsFile}`, `${objectName},`);
+};
+
+export const addToErroredTimestamps = (timestamp: string) => {
+  fs.appendFileSync(`${outputDir}/${erroredTimestampsFile}`, `${timestamp},`);
+};
+
+export const saveLastTimestamp = (timestamp: string) => {
+  fs.writeFileSync(`${outputDir}/${timestampFile}`, `${timestamp}`);
+};
+
+export const getLastSuccessfulTimestamp = () => {
+  return fs.readFileSync(`${outputDir}/${timestampFile}`, "utf8");
 };
 
 export function toBuffer(arrayBuffer: ArrayBuffer) {
