@@ -16,8 +16,8 @@ async function main() {
     const timestamp = erroredTimestamps[i];
     let hasError = true;
     while (hasError) {
-      const { hasTableError } = await downloadBatch(timestamp);
-      if (hasTableError) {
+      const { hasError: hasDownloadError } = await downloadBatch(timestamp);
+      if (hasDownloadError) {
         addToErroredTimestampsSecondPass(timestamp);
         console.log("Error downloading batch, retrying in 2 seconds...");
         await new Promise((resolve) => setTimeout(resolve, 2000));

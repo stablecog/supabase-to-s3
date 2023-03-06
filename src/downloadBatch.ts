@@ -36,7 +36,7 @@ export async function downloadBatch(start_timestamp: string) {
     if (data.length === 0) {
       hasMore = false;
       return {
-        hasTableError: false,
+        hasError: false,
         hasMore,
       };
     }
@@ -66,7 +66,7 @@ export async function downloadBatch(start_timestamp: string) {
           if (result.error) {
             console.log(result.error);
             return {
-              hasTableError: true,
+              hasError: true,
               lastTimestamp,
               hasMore,
             };
@@ -79,7 +79,7 @@ export async function downloadBatch(start_timestamp: string) {
       } catch (error) {
         console.log(error);
         return {
-          hasTableError: true,
+          hasError: true,
           lastTimestamp,
           hasMore,
         };
@@ -88,7 +88,7 @@ export async function downloadBatch(start_timestamp: string) {
     lastTimestamp = data[data.length - 1].created_at;
   } catch (error) {
     return {
-      hasTableError: true,
+      hasError: true,
       lastTimestamp,
       hasMore,
     };
@@ -100,7 +100,7 @@ export async function downloadBatch(start_timestamp: string) {
     )} seconds`
   );
   return {
-    hasTableError: false,
+    hasError: false,
     hasMore,
     lastTimestamp,
   };
