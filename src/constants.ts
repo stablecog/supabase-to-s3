@@ -8,8 +8,8 @@ export const supabaseAdmin = createClient(
 );
 export const supabaseTable = "generation";
 export const supabaseTableSelectLimit = 1000;
-export const supabaseBucket = "generation";
 export const downloadBatchSize = 100;
+export const supabaseBucket = "generation";
 export const downloadDir = "downloads";
 export const outputDir = "outputs";
 export const timestampFile = "last_successful_timestamp.txt";
