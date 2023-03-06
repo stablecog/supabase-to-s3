@@ -1,6 +1,5 @@
 import {
   downloadDir,
-  erroredObjectsFile,
   erroredTimestampsFile,
   outputDir,
   timestampFile,
@@ -23,20 +22,11 @@ export function createDirs() {
     fs.writeFileSync(`${outputDir}/${timestampFile}`, "");
   }
 
-  // Create the errored objects file if it doesn't exist
-  if (!fs.existsSync(`${outputDir}/${erroredObjectsFile}`)) {
-    fs.writeFileSync(`${outputDir}/${erroredObjectsFile}`, "");
-  }
-
   // Create the errored timestamps file if it doesn't exist
   if (!fs.existsSync(`${outputDir}/${erroredTimestampsFile}`)) {
     fs.writeFileSync(`${outputDir}/${erroredTimestampsFile}`, "");
   }
 }
-
-export const addToErroredObjects = (objectName: string) => {
-  fs.appendFileSync(`${outputDir}/${erroredObjectsFile}`, `${objectName},`);
-};
 
 export const addToErroredTimestamps = (timestamp: string) => {
   fs.appendFileSync(`${outputDir}/${erroredTimestampsFile}`, `${timestamp},`);

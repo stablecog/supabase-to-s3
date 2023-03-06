@@ -7,7 +7,7 @@ import {
   supabaseTableSelectLimit,
 } from "./constants";
 import { createClient } from "@supabase/supabase-js";
-import { addToErroredObjects, toBuffer } from "./helpers";
+import { toBuffer } from "./helpers";
 import fs from "fs";
 
 const supabaseAdmin = createClient(
@@ -70,7 +70,6 @@ export async function downloadBatch(start_timestamp: string) {
           if (result.error) {
             console.log(result.error);
             downloadErrorCount++;
-            addToErroredObjects(paths[j]);
             return {
               hasTableError: true,
               lastTimestamp,
@@ -83,9 +82,6 @@ export async function downloadBatch(start_timestamp: string) {
         }
         i += toAdd;
       } catch (error) {
-        for (const path in paths) {
-          addToErroredObjects(path);
-        }
         console.log(error);
         return {
           hasTableError: true,
