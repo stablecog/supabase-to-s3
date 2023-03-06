@@ -7,16 +7,13 @@ import {
   supabaseTableSelectLimit,
 } from "./constants";
 import { createClient } from "@supabase/supabase-js";
-import { toBuffer } from "./helpers";
+import { promiseWithTimeout, toBuffer } from "./helpers";
 import fs from "fs";
 
 const supabaseAdmin = createClient(
   process.env.SUPABASE_URL as string,
   process.env.SUPABASE_ADMIN_KEY as string
 );
-
-const timeout = <T>(prom: Promise<T>, time: number) =>
-  Promise.race([prom, new Promise<T>((_r, rej) => setTimeout(rej, time))]);
 
 export async function downloadBatch(start_timestamp: string) {
   const start = Date.now();
@@ -56,7 +53,7 @@ export async function downloadBatch(start_timestamp: string) {
         finalPaths.push(`${downloadDir}/${data[j].image_object_name}`);
       }
       let promises = paths.map((p) =>
-        timeout(
+        promiseWithTimeout(
           supabaseAdmin.storage.from(supabaseBucket).download(p),
           maxFetchDuration
         )

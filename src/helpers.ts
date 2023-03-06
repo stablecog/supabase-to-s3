@@ -72,3 +72,6 @@ export function toBuffer(arrayBuffer: ArrayBuffer) {
   }
   return buffer;
 }
+
+export const promiseWithTimeout = <T>(prom: Promise<T>, time: number) =>
+  Promise.race([prom, new Promise<T>((_r, rej) => setTimeout(rej, time))]);
