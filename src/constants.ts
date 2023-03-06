@@ -15,3 +15,4 @@ export const outputDir = "outputs";
 export const timestampFile = "last_successful_timestamp.txt";
 export const erroredObjectsFile = "errored_objects.txt";
 export const erroredTimestampsFile = "errored_timestamps.txt";
+export const maxFetchDuration = 5000;
