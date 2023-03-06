@@ -1,116 +1,41 @@
+import dotenv from "dotenv";
 import {
-  downloadBatchSize,
-  downloadDir,
-  maxFetchDuration,
-  supabaseBucket,
-  supabaseTable,
-  supabaseTableSelectLimit,
-} from "./constants";
-import { createClient } from "@supabase/supabase-js";
-import { addToErroredObjects, toBuffer } from "./helpers";
-import fs from "fs";
+  addToErroredTimestamps,
+  createDirs,
+  getLastSuccessfulTimestamp,
+  saveLastTimestamp,
+} from "./helpers";
+import { downloadBatch } from "./downloadBatch";
 
-const supabaseAdmin = createClient(
-  process.env.SUPABASE_URL as string,
-  process.env.SUPABASE_ADMIN_KEY as string
-);
+dotenv.config();
 
-const timeout = <T>(prom: Promise<T>, time: number) =>
-  Promise.race([prom, new Promise<T>((_r, rej) => setTimeout(rej, time))]);
-
-export async function downloadBatch(start_timestamp: string) {
+async function main() {
+  createDirs();
+  let hasMoreToDownload = true;
+  let timestamp = "1975-01-01T00:00:00.000000+00:00";
+  let lastTimestamp = getLastSuccessfulTimestamp();
+  if (lastTimestamp) {
+    timestamp = lastTimestamp;
+  }
   const start = Date.now();
-  let lastTimestamp: string | undefined = undefined;
-  let hasMore = true;
-  let downloadedCount = 0;
-  let downloadErrorCount = 0;
-  try {
-    const { data, error } = await supabaseAdmin
-      .from(supabaseTable)
-      .select("image_object_name,created_at,user_id")
-      .not("image_object_name", "is", null)
-      .not("user_id", "is", null)
-      .order("created_at", { ascending: true })
-      .gt("created_at", start_timestamp)
-      .limit(supabaseTableSelectLimit);
-    if (error || !data) {
-      console.log(error);
-      throw new Error("Error fetching data from table");
+  while (hasMoreToDownload) {
+    const { hasTableError, lastTimestamp, hasMore } = await downloadBatch(
+      timestamp
+    );
+    hasMoreToDownload = hasMore;
+    if (hasTableError) {
+      addToErroredTimestamps(timestamp);
+      console.log("Error downloading batch, retrying in 2 seconds...");
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      continue;
     }
-    if (data.length === 0) {
-      hasMore = false;
-      return {
-        hasTableError: false,
-        hasMore,
-      };
+    if (lastTimestamp) {
+      timestamp = lastTimestamp;
+      saveLastTimestamp(timestamp);
     }
-    let i = 0;
-    console.log("Total for batch:", data.length);
-    while (i < data.length) {
-      let paths = [];
-      let finalPaths: string[] = [];
-      const toAdd = Math.min(downloadBatchSize, data.length - i);
-      for (let j = i; j < i + toAdd; j++) {
-        const path = `${data[j].user_id}/${data[j].image_object_name}`;
-        paths.push(path);
-        finalPaths.push(`${downloadDir}/${data[j].image_object_name}`);
-      }
-      let promises = paths.map((p) =>
-        timeout(
-          supabaseAdmin.storage.from(supabaseBucket).download(p),
-          maxFetchDuration
-        )
-      );
-      try {
-        const results = await Promise.all(promises);
-        console.log("Downloaded:", paths);
-        // Write to file
-        for (let j = 0; j < results.length; j++) {
-          const result = results[j];
-          if (result.error) {
-            console.log(result.error);
-            downloadErrorCount++;
-            addToErroredObjects(paths[j]);
-            return {
-              hasTableError: true,
-              lastTimestamp,
-              hasMore,
-            };
-          }
-          const buffer = toBuffer(await result.data.arrayBuffer());
-          fs.writeFileSync(finalPaths[j], buffer);
-          downloadedCount++;
-        }
-        i += toAdd;
-      } catch (error) {
-        for (const path in paths) {
-          addToErroredObjects(path);
-        }
-        console.log(error);
-        return {
-          hasTableError: true,
-          lastTimestamp,
-          hasMore,
-        };
-      }
-    }
-    lastTimestamp = data[data.length - 1].created_at;
-  } catch (error) {
-    return {
-      hasTableError: true,
-      lastTimestamp,
-      hasMore,
-    };
   }
   const end = Date.now();
-  console.log(
-    `Batch complete - Downloaded ${downloadedCount} files in ${Math.round(
-      (end - start) / 1000
-    )} seconds - ${downloadErrorCount} errors`
-  );
-  return {
-    hasTableError: false,
-    hasMore,
-    lastTimestamp,
-  };
+  console.log(`Total time: ${Math.round((end - start) / 1000 / 60)} minutes`);
 }
+
+main();
